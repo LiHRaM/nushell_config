@@ -28,10 +28,6 @@ def "venv path windows" [venv-dir] {
     [[name, value]; [Path $new-path]]
 }
 
-def windows? [] {
-    (sys).host.name == "Windows"
-}
-
 def "char envsep" [] {
     if (windows?) { ";" } { ":" }
 }

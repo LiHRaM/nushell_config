@@ -8,5 +8,5 @@ def "lihram nvim sync" [] {
 
 # Enter Neovim in the configuration directory.
 def "lihram nvim edit" [] {
-  if (windows?) { cd $"($nu.env.LOCALAPPDATA)/nvim"; nvim } { echo "This is only supported on Windows!" } 
+  if (windows?) { cd $"($nu.env.LOCALAPPDATA)/nvim"; nvim } else { echo "This is only supported on Windows!" } 
 }

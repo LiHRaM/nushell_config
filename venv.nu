@@ -11,7 +11,8 @@ def venv [venv-dir] {
 }
 
 def "venv path" [venv-dir] {
-	if (windows?) { (venv path windows $venv-abs-dir) } { (venv path unix $venv-abs-dir) }
+    let venv-abs-dir = ($venv-dir | path expand)
+	if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
 }
 
 def "venv path unix" [venv-dir] {
@@ -29,6 +30,6 @@ def "venv path windows" [venv-dir] {
 }
 
 def "char envsep" [] {
-    if (windows?) { ";" } { ":" }
+    if (windows?) { ";" } else { ":" }
 }
 

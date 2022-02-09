@@ -7,5 +7,5 @@ def nufzf [] {
 
 # Skip values that are empty
 def "not empty" [] {
-	each { if ($it | empty?) { } { $it } }
+	each { if ($it | empty?) { } else { $it } }
 }

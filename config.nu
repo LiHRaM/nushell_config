@@ -1,10 +1,20 @@
 # Environment variables
 load-env {
+    # Prompt
+    PROMPT_COMMAND: "starship prompt --cmd-duration $env.CMD_DURATION_MS | str trim",
+    PROMPT_COMMAND_RIGHT: "",
+    PROMPT_INDICATOR: " ",
+
+    # Used by nu commands
+    REPOS_DIR: (if (windows?) { "C:\git" } else { "~/git" | path expand })
+
+    # Useful OS defaults
     LANG: "en_DK"
     LC_ALL: "C.UTF-8"
-    REPOS_DIR: (if (windows?) { "C:\git" } else { "~/git" | path expand })
+    EDITOR: "nvim",
+
+    # 3rd party programs
     FZF_DEFAULT_OPTS: "--layout=reverse"
-    EDITOR: "nvim"
 }
 
 # Kubernetes

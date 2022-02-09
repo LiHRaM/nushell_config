@@ -71,7 +71,7 @@ def "char envsep" [] {
 
 def "venv deactivate" [] {
 	let path-name = if (windows?) { "Path" } else { "PATH" }
-	let-env $path-name = $nu.env.VENV_OLD_PATH
+	let-env $path-name = $env.VENV_OLD_PATH
 	unlet-env VIRTUAL_ENV
 	unlet-env VENV_OLD_PATH
 }
@@ -85,12 +85,12 @@ def "lihram nvim sync" [] {
 
 # Enter Neovim in the configuration directory.
 def "lihram nvim edit" [] {
-  if (windows?) { cd $"($nu.env.LOCALAPPDATA)/nvim"; nvim } else { echo "This is only supported on Windows!" } 
+  if (windows?) { cd $"($env.LOCALAPPDATA)/nvim"; nvim } else { echo "This is only supported on Windows!" } 
 }
 
 # Switch to the nixos configuration and enter Neovim
 def "lihram nixos config" [] {
-    if (nixos?) { cd "~/.nixos"; eval $nu.env.EDITOR } else { echo "Command only supported on NixOS" }
+    if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
 }
 
 def windows? [] {
@@ -135,7 +135,7 @@ def lihram [] { }
 
 # Enter this configuration directory
 def "lihram nu config" [] {
-  cd ("~/.nushell/lihram" | path expand); eval $nu.env.EDITOR
+  cd ("~/.nushell/lihram" | path expand); eval $env.EDITOR
 }
 
 def eval [input: string] {

@@ -6,15 +6,16 @@ load-env {
     PROMPT_INDICATOR: " ",
 
     # Used by nu commands
-    REPOS_DIR: (if (windows?) { "C:\git" } else { "~/git" | path expand })
+    REPOS_DIR: (if (windows?) { "C:\git" } else { "~/git" | path expand }),
 
     # Useful OS defaults
-    LANG: "en_DK"
-    LC_ALL: "C.UTF-8"
+    LANG: "en_DK",
+    LC_ALL: "C.UTF-8",
     EDITOR: "nvim",
 
     # 3rd party programs
-    FZF_DEFAULT_OPTS: "--layout=reverse"
+    FZF_DEFAULT_OPTS: "--layout=reverse",
+    CARGO_TARGET_DIR: "~/.cargo/target",
 }
 
 # Kubernetes

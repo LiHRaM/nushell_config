@@ -18,6 +18,25 @@ load-env {
     CARGO_TARGET_DIR: "~/.cargo/target",
 }
 
+# Execute an arbitrary string as Nushell input
+def eval [input: string] {
+  nu -c $input
+}
+
+# Whether the current system is Windows
+def windows? [] {
+    (sys).host.name == "Windows"
+}
+
+# Whether the current system is 
+def nixos? [] {
+    (sys).host.name == "NixOS"
+}
+
+def "char envsep" [] {
+    if (windows?) { ";" } else { ":" }
+}
+
 # Kubernetes
 alias awp = let-env AWS_PROFILE = (open --raw ~/.aws/config | lines | parse "[profile {profile}]" | get profile | nufzf)
 alias awc = let-env AWS_PROFILE = (open --raw ~/.aws/credentials | lines | parse "[{profile}]" | get profile | nufzf)
@@ -35,71 +54,75 @@ def res_or_pwd [res] {
     if ($res | empty?) { pwd | str trim } else { $res }
 }
 
-def venv [venv-dir] {
-    let venv-abs-dir = ($venv-dir | path expand)
-    let venv-name = ($venv-abs-dir | path basename)
-    let old-path = ($nu.path | str collect (char envsep))
-    let new-path = (venv path $venv-abs-dir)
-    let new-env = [[name, value];
-                   [VENV_OLD_PATH $old-path]
-                   [VIRTUAL_ENV $venv-name]]
+module venv {
+    export def venv [venv-dir] {
+        let venv-abs-dir = ($venv-dir | path expand)
+        let venv-name = ($venv-abs-dir | path basename)
+        let old-path = ($nu.path | str collect (char envsep))
+        let new-path = (venv path $venv-abs-dir)
+        let new-env = [[name, value];
+                       [VENV_OLD_PATH $old-path]
+                       [VIRTUAL_ENV $venv-name]]
 
-    $new-env | append $new-path
+        $new-env | append $new-path
+    }
+
+    export def "venv path" [venv-dir] {
+        let venv-abs-dir = ($venv-dir | path expand)
+        if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
+    }
+
+    export def "venv path unix" [venv-dir] {
+        let venv-path = ([$venv-dir "bin"] | path join)
+        let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
+        [[name, value]; [PATH $new-path]]
+    }
+
+    export def "venv path windows" [venv-dir] {
+        # 1. Conda on Windows needs a few additional Path elements
+        # 2. The path env var on Windows is called Path (not PATH)
+        let venv-path = ([$venv-dir "Scripts"] | path join)
+        let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
+        [[name, value]; [Path $new-path]]
+    }
+
+    export def "venv deactivate" [] {
+        let path-name = if (windows?) { "Path" } else { "PATH" }
+        let-env $path-name = $env.VENV_OLD_PATH
+        unlet-env VIRTUAL_ENV
+        unlet-env VENV_OLD_PATH
+    }
 }
 
-def "venv path" [venv-dir] {
-    let venv-abs-dir = ($venv-dir | path expand)
-	if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
+
+module lihram {
+    # Edit the Neovim configuration directory. Windows only.
+    export def "conf nvim edit" [] {
+        if ($false == windows?) { echo "This is only supported on Windows!"; } else {
+            cd $"($env.LOCALAPPDATA/nvim)"; eval $env.EDITOR;
+        }
+    }
+
+    # Run PackerSync in headless nvim, waiting until install completes.
+    export def "conf nvim sync" [] {
+        nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+    }
+
+    # Switch to the nixos configuration and enter Neovim
+    export def "conf nixos edit" [] {
+        if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
+    }
 }
 
-def "venv path unix" [venv-dir] {
-    let venv-path = ([$venv-dir "bin"] | path join)
-    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-    [[name, value]; [PATH $new-path]]
-}
+module dotnet {
+    # Runs `dotnet test`, filtering out end-to-end tests.
+    export def "dotnet unit" [] { dotnet test --filter TestCategory!=E2ETests }
 
-def "venv path windows" [venv-dir] {
-    # 1. Conda on Windows needs a few additional Path elements
-    # 2. The path env var on Windows is called Path (not PATH)
-    let venv-path = ([$venv-dir "Scripts"] | path join)
-    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-    [[name, value]; [Path $new-path]]
-}
+    # Runs `dotnet test`, with a filter matching only end-to-end tests.
+    export def "dotnet e2e" [] { dotnet test --filter TestCategory=E2ETests }
 
-def "char envsep" [] {
-    if (windows?) { ";" } else { ":" }
-}
-
-def "venv deactivate" [] {
-	let path-name = if (windows?) { "Path" } else { "PATH" }
-	let-env $path-name = $env.VENV_OLD_PATH
-	unlet-env VIRTUAL_ENV
-	unlet-env VENV_OLD_PATH
-}
-
-def "lihram nvim" [] { help lihram nvim }
-
-# Run PackerSync in headless nvim, waiting until install completes.
-def "lihram nvim sync" [] {
-  nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
-}
-
-# Enter Neovim in the configuration directory.
-def "lihram nvim edit" [] {
-  if (windows?) { cd $"($env.LOCALAPPDATA)/nvim"; nvim } else { echo "This is only supported on Windows!" } 
-}
-
-# Switch to the nixos configuration and enter Neovim
-def "lihram nixos config" [] {
-    if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
-}
-
-def windows? [] {
-    (sys).host.name == "Windows"
-}
-
-def nixos? [] {
-    (sys).host.name == "NixOS"
+    # Runs `dotnet format` with warn level `info`.
+    export def "dotnet fmt" [] { dotnet format -w info }
 }
 
 # Use fzf to checkout to existing branches
@@ -123,22 +146,4 @@ def "not empty" [] {
 	each { if ($it | empty?) { } else { $it } }
 }
 
-# Runs `dotnet test`, filtering out end-to-end tests.
-def "dotnet unit" [] { dotnet test --filter TestCategory!=E2ETests }
 
-# Runs `dotnet test`, with a filter matching only end-to-end tests.
-def "dotnet e2e" [] { dotnet test --filter TestCategory=E2ETests }
-
-# Runs `dotnet format` with warn level `info`.
-def "dotnet fmt" [] { dotnet format -w info }
-# Empty placeholder for custom commands
-def lihram [] { }
-
-# Enter this configuration directory
-def "lihram nu config" [] {
-  cd ("~/.nushell/lihram" | path expand); eval $env.EDITOR
-}
-
-def eval [input: string] {
-  nu -c $input
-}

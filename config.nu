@@ -33,6 +33,7 @@ def nixos? [] {
     (sys).host.name == "NixOS"
 }
 
+
 def "char envsep" [] {
     if (windows?) { ";" } else { ":" }
 }
@@ -54,64 +55,60 @@ def res_or_pwd [res] {
     if ($res | empty?) { pwd | str trim } else { $res }
 }
 
-module venv {
-    export def venv [venv-dir] {
-        let venv-abs-dir = ($venv-dir | path expand)
-        let venv-name = ($venv-abs-dir | path basename)
-        let old-path = ($nu.path | str collect (char envsep))
-        let new-path = (venv path $venv-abs-dir)
-        let new-env = [[name, value];
-                       [VENV_OLD_PATH $old-path]
-                       [VIRTUAL_ENV $venv-name]]
 
-        $new-env | append $new-path
-    }
+def venv [venv-dir] {
+    let venv-abs-dir = ($venv-dir | path expand)
+    let venv-name = ($venv-abs-dir | path basename)
+    let old-path = ($nu.path | str collect (char envsep))
+    let new-path = (venv path $venv-abs-dir)
+    let new-env = [[name, value];
+                   [VENV_OLD_PATH $old-path]
+                   [VIRTUAL_ENV $venv-name]]
 
-    export def "venv path" [venv-dir] {
-        let venv-abs-dir = ($venv-dir | path expand)
-        if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
-    }
+    $new-env | append $new-path
+}
 
-    export def "venv path unix" [venv-dir] {
-        let venv-path = ([$venv-dir "bin"] | path join)
-        let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-        [[name, value]; [PATH $new-path]]
-    }
+def "venv path" [venv-dir] {
+    let venv-abs-dir = ($venv-dir | path expand)
+    if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
+}
 
-    export def "venv path windows" [venv-dir] {
-        # 1. Conda on Windows needs a few additional Path elements
-        # 2. The path env var on Windows is called Path (not PATH)
-        let venv-path = ([$venv-dir "Scripts"] | path join)
-        let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-        [[name, value]; [Path $new-path]]
-    }
+def "venv path unix" [venv-dir] {
+    let venv-path = ([$venv-dir "bin"] | path join)
+    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
+    [[name, value]; [PATH $new-path]]
+}
 
-    export def "venv deactivate" [] {
-        let path-name = if (windows?) { "Path" } else { "PATH" }
-        let-env $path-name = $env.VENV_OLD_PATH
-        unlet-env VIRTUAL_ENV
-        unlet-env VENV_OLD_PATH
+def "venv path windows" [venv-dir] {
+    # 1. Conda on Windows needs a few additional Path elements
+    # 2. The path env var on Windows is called Path (not PATH)
+    let venv-path = ([$venv-dir "Scripts"] | path join)
+    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
+    [[name, value]; [Path $new-path]]
+}
+
+def "venv deactivate" [] {
+    let path-name = if (windows?) { "Path" } else { "PATH" }
+    let-env $path-name = $env.VENV_OLD_PATH
+    unlet-env VIRTUAL_ENV
+    unlet-env VENV_OLD_PATH
+}
+
+# Edit the Neovim configuration directory. Windows only.
+def "conf nvim edit" [] {
+    if ($false == windows?) { echo "This is only supported on Windows!"; } else {
+        cd $"($env.LOCALAPPDATA/nvim)"; eval $env.EDITOR;
     }
 }
 
+# Run PackerSync in headless nvim, waiting until install completes.
+def "conf nvim sync" [] {
+    nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+}
 
-module lihram {
-    # Edit the Neovim configuration directory. Windows only.
-    export def "conf nvim edit" [] {
-        if ($false == windows?) { echo "This is only supported on Windows!"; } else {
-            cd $"($env.LOCALAPPDATA/nvim)"; eval $env.EDITOR;
-        }
-    }
-
-    # Run PackerSync in headless nvim, waiting until install completes.
-    export def "conf nvim sync" [] {
-        nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
-    }
-
-    # Switch to the nixos configuration and enter Neovim
-    export def "conf nixos edit" [] {
-        if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
-    }
+# Switch to the nixos configuration and enter Neovim
+def "conf nixos edit" [] {
+    if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
 }
 
 module dotnet {

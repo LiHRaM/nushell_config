@@ -44,7 +44,6 @@ alias awc = let-env AWS_PROFILE = (open --raw ~/.aws/credentials | lines | parse
 alias kbp = do { kubectl config use-context (kubectl config get-contexts --no-headers | lines | parse -r "[\*]?\s*(?P<Context>\S*).*" | get Context | nufzf) }
 
 alias vim = nvim
-alias NVIM_HOME = $"($env.APPDATA)/../Local/nvim"
 
 # Fuzzy navigate
 alias repos = cd (res_or_pwd (gix tools find $env.REPOS_DIR | sd $"(if (windows?) { "\\" } else { "/" })\.git$" "" | lines | nufzf))
@@ -96,8 +95,8 @@ def "venv deactivate" [] {
 
 # Edit the Neovim configuration directory. Windows only.
 def "conf nvim edit" [] {
-    if ($false == windows?) { echo "This is only supported on Windows!"; } else {
-        cd $"($env.LOCALAPPDATA/nvim)"; eval $env.EDITOR;
+    if ($false == (windows?)) { echo "This is only supported on Windows!"; } else {
+        cd $"($env.LOCALAPPDATA)/nvim"; eval $env.EDITOR;
     }
 }
 

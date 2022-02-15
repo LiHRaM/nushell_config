@@ -11,7 +11,7 @@ load-env {
     # Useful OS defaults
     LANG: "en_DK",
     LC_ALL: "C.UTF-8",
-    EDITOR: "nvim",
+    EDITOR: "hx",
 
     # 3rd party programs
     FZF_DEFAULT_OPTS: "--layout=reverse",

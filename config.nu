@@ -11,6 +11,7 @@ load-env {
     # Useful OS defaults
     LANG: "en_DK",
     LC_ALL: "C.UTF-8",
+    LESSCHARSET: "UTF-8",
     EDITOR: "hx",
 
     # 3rd party programs

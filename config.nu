@@ -15,7 +15,7 @@ load-env {
 
     # 3rd party programs
     FZF_DEFAULT_OPTS: "--layout=reverse",
-    CARGO_TARGET_DIR: "~/.cargo/target",
+    CARGO_TARGET_DIR: ("~/.cargo/target" | path expand),
 }
 
 # Execute an arbitrary string as Nushell input

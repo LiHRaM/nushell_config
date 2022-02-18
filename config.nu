@@ -48,7 +48,7 @@ alias vim = nvim
 
 # Fuzzy navigate
 alias repos = cd (res_or_pwd (gix tools find $env.REPOS_DIR | sd $"(if (windows?) { "\\" } else { "/" })\.git$" "" | lines | nufzf))
-alias cdd = cd (res_or_pwd (ls | where type == dir | each { $it.name } | nufzf))
+alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nufzf))
 
 # Change directory to the path OR, if the path is empty, stay.
 def res_or_pwd [res] {
@@ -124,11 +124,11 @@ module dotnet {
 
 # Use fzf to checkout to existing branches
 def "git co" [] {
-	git branch | lines | parse -r "^\s+(?P<Branch>.*)$" | get Branch | nufzf | each { git checkout $it }
+	git branch | lines | parse -r "^\s+(?P<Branch>.*)$" | get Branch | nufzf | each { |it| git checkout $it }
 }
 
 def "git dd" [] {
-	git branch -vl '*/*' | lines | split column " " BranchName Hash Status --collapse-empty | where Status == '[gone]' | each { git branch -D $it.BranchName };
+	git branch -vl '*/*' | lines | split column " " BranchName Hash Status --collapse-empty | where Status == '[gone]' | each { |it| git branch -D $it.BranchName };
 }
 
 # A Nushell-compatible fzf wrapper
@@ -140,7 +140,7 @@ def nufzf [] {
 
 # Skip values that are empty
 def "not empty" [] {
-	each { if ($it | empty?) { } else { $it } }
+	each { |it| if ($it | empty?) { } else { $it } }
 }
 
 

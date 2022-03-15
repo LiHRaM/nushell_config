@@ -91,8 +91,8 @@ def "venv path windows" [venv-dir] {
 def "venv deactivate" [] {
     let path-name = if (windows?) { "Path" } else { "PATH" }
     let-env $path-name = $env.VENV_OLD_PATH
-    unlet-env VIRTUAL_ENV
-    unlet-env VENV_OLD_PATH
+    hide VIRTUAL_ENV
+    hide VENV_OLD_PATH
 }
 
 # Edit the Neovim configuration directory. Windows only.

@@ -6,7 +6,7 @@ load-env {
     PROMPT_INDICATOR: " ",
 
     # Used by nu commands
-    REPOS_DIR: (if (windows?) { "C:\git" } else { "~/git" | path expand }),
+    REPOS_DIR: (if (windows?) { 'C:\git' } else { '~/git' | path expand }),
 
     # Useful OS defaults
     LANG: "en_DK",
@@ -59,13 +59,14 @@ def res_or_pwd [res] {
 def venv [venv-dir] {
     let venv-abs-dir = ($venv-dir | path expand)
     let venv-name = ($venv-abs-dir | path basename)
-    let old-path = ($nu.path | str collect (char envsep))
+    let old-path = ($env.PATH | str collect (char envsep))
     let new-path = (venv path $venv-abs-dir)
-    let new-env = [[name, value];
-                   [VENV_OLD_PATH $old-path]
-                   [VIRTUAL_ENV $venv-name]]
 
-    $new-env | append $new-path
+    {
+        VENV_OLD_PATH: $old-path,
+        VIRTUAL_ENV: $venv-name,
+        PATH: $new-path
+    }
 }
 
 def "venv path" [venv-dir] {
@@ -75,8 +76,8 @@ def "venv path" [venv-dir] {
 
 def "venv path unix" [venv-dir] {
     let venv-path = ([$venv-dir "bin"] | path join)
-    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-    [[name, value]; [PATH $new-path]]
+    let new-path = ($env.PATH | prepend $venv-path | str collect (char envsep))
+    $new-path
 }
 
 def "venv path windows" [venv-dir] {
@@ -84,7 +85,7 @@ def "venv path windows" [venv-dir] {
     # 2. The path env var on Windows is called Path (not PATH)
     let venv-path = ([$venv-dir "Scripts"] | path join)
     let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-    [[name, value]; [Path $new-path]]
+    $new-path
 }
 
 def "venv deactivate" [] {
@@ -120,15 +121,6 @@ module dotnet {
 
     # Runs `dotnet format` with warn level `info`.
     export def "dotnet fmt" [] { dotnet format -w info }
-}
-
-# Use fzf to checkout to existing branches
-def "git co" [] {
-	git branch | lines | parse -r "^\s+(?P<Branch>.*)$" | get Branch | nufzf | each { |it| git checkout $it }
-}
-
-def "git dd" [] {
-	git branch -vl '*/*' | lines | split column " " BranchName Hash Status --collapse-empty | where Status == '[gone]' | each { |it| git branch -D $it.BranchName };
 }
 
 # A Nushell-compatible fzf wrapper

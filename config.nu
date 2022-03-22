@@ -55,6 +55,10 @@ def res_or_pwd [res] {
     if ($res | empty?) { pwd | str trim } else { $res }
 }
 
+# Virtual environments
+
+alias py-begin = load-env (venv .venv)
+alias py-done = load-env (venv deactivate)
 
 def venv [venv-dir] {
     let venv-abs-dir = ($venv-dir | path expand)
@@ -89,15 +93,16 @@ def "venv path windows" [venv-dir] {
 }
 
 def "venv deactivate" [] {
-    let path-name = if (windows?) { "Path" } else { "PATH" }
-    let-env $path-name = $env.VENV_OLD_PATH
-    hide VIRTUAL_ENV
-    hide VENV_OLD_PATH
+    {
+        PATH: $env.VENV_OLD_PATH,
+        VENV_OLD_PATH: $nothing,
+        VIRTUAL_ENV: $nothing,
+    }
 }
 
 # Edit the Neovim configuration directory. Windows only.
 def "conf nvim edit" [] {
-    if ($false == (windows?)) { echo "This is only supported on Windows!"; } else {
+    if (false == (windows?)) { echo "This is only supported on Windows!"; } else {
         cd $"($env.LOCALAPPDATA)/nvim"; eval $env.EDITOR;
     }
 }

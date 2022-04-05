@@ -47,7 +47,7 @@ alias kbp = do { kubectl config use-context (kubectl config get-contexts --no-he
 alias vim = nvim
 
 # Fuzzy navigate
-alias repos = cd (res_or_pwd (gix tools find $env.REPOS_DIR | fzf | str trim))
+alias repos = cd (res_or_pwd (ein tools find $env.REPOS_DIR | fzf | str trim))
 alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nufzf))
 
 # Change directory to the path OR, if the path is empty, stay.

@@ -1,24 +1,3 @@
-# Environment variables
-load-env {
-    # Prompt
-    PROMPT_COMMAND: "starship prompt --cmd-duration $env.CMD_DURATION_MS | str trim",
-    PROMPT_COMMAND_RIGHT: "",
-    PROMPT_INDICATOR: " ",
-
-    # Used by nu commands
-    REPOS_DIR: (if (windows?) { 'C:\git' } else { '~/git' | path expand }),
-
-    # Useful OS defaults
-    LANG: "en_DK",
-    LC_ALL: "C.UTF-8",
-    LESSCHARSET: "UTF-8",
-    EDITOR: "hx",
-
-    # 3rd party programs
-    FZF_DEFAULT_OPTS: "--layout=reverse",
-    CARGO_TARGET_DIR: ("~/.cargo/target" | path expand),
-}
-
 # Execute an arbitrary string as Nushell input
 def eval [input: string] {
   nu -c $input
@@ -34,10 +13,7 @@ def nixos? [] {
     (sys).host.name == "NixOS"
 }
 
-
-def "char envsep" [] {
-    if (windows?) { ";" } else { ":" }
-}
+let-env REPOS_DIR = (if (windows?) { 'C:\git' } else { '~/git' | path expand })
 
 # Kubernetes
 alias awp = let-env AWS_PROFILE = (open --raw ~/.aws/config | lines | parse "[profile {profile}]" | get profile | nufzf)
@@ -140,8 +116,6 @@ def "not empty" [] {
 	each { |it| if ($it | empty?) { } else { $it } }
 }
 
-
-
 module completions {
     # Custom completions for external commands (those outside of Nushell)
     # Each completions has two parts: the form of the external command, including its flags and parameters
@@ -149,7 +123,7 @@ module completions {
     #
     # This is a simplified version of completions for git branches and git remotes
     def "nu-complete git branches" [] {
-      ^git branch | lines | each { |line| $line | str find-replace '\* ' '' | str trim }
+      ^git branch | lines | each { |line| $line | str replace '\* ' '' | str trim }
     }
   
     def "nu-complete git remotes" [] {

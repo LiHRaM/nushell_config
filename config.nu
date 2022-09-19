@@ -31,51 +31,6 @@ def res_or_pwd [res] {
     if ($res | empty?) { pwd | str trim } else { $res }
 }
 
-# Virtual environments
-
-alias py-begin = load-env (venv .venv)
-alias py-done = load-env (venv deactivate)
-
-def venv [venv-dir] {
-    let venv-abs-dir = ($venv-dir | path expand)
-    let venv-name = ($venv-abs-dir | path basename)
-    let old-path = ($env.PATH | str collect (char envsep))
-    let new-path = (venv path $venv-abs-dir)
-
-    {
-        VENV_OLD_PATH: $old-path,
-        VIRTUAL_ENV: $venv-name,
-        PATH: $new-path
-    }
-}
-
-def "venv path" [venv-dir] {
-    let venv-abs-dir = ($venv-dir | path expand)
-    if (windows?) { (venv path windows $venv-abs-dir) } else { (venv path unix $venv-abs-dir) }
-}
-
-def "venv path unix" [venv-dir] {
-    let venv-path = ([$venv-dir "bin"] | path join)
-    let new-path = ($env.PATH | prepend $venv-path | str collect (char envsep))
-    $new-path
-}
-
-def "venv path windows" [venv-dir] {
-    # 1. Conda on Windows needs a few additional Path elements
-    # 2. The path env var on Windows is called Path (not PATH)
-    let venv-path = ([$venv-dir "Scripts"] | path join)
-    let new-path = ($nu.path | prepend $venv-path | str collect (char envsep))
-    $new-path
-}
-
-def "venv deactivate" [] {
-    {
-        PATH: $env.VENV_OLD_PATH,
-        VENV_OLD_PATH: $nothing,
-        VIRTUAL_ENV: $nothing,
-    }
-}
-
 # Edit the Neovim configuration directory. Windows only.
 def "conf nvim edit" [] {
     if (false == (windows?)) { echo "This is only supported on Windows!"; } else {

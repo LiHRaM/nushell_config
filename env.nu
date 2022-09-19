@@ -1,10 +1,14 @@
+let-env config = {
+    show_banner: false
+}
+
 load-env {
-    PROMPT_COMMAND: "",
-    PROMPT_COMMAND_RIGHT: "",
-    PROMPT_INDICATOR: "; ",
-    PROMPT_INDICATOR_VI_INSERT: { ": " },
-    PROMPT_INDICATOR_VI_NORMAL: { "; " },
-    PROMPT_MULTILINE_INDICATOR: { "::: " },
+    # PROMPT_COMMAND: "",
+    # PROMPT_COMMAND_RIGHT: "",
+    # PROMPT_INDICATOR: "; ",
+    # PROMPT_INDICATOR_VI_INSERT: { ": " },
+    # PROMPT_INDICATOR_VI_NORMAL: { "; " },
+    # PROMPT_MULTILINE_INDICATOR: { "::: " },
     ENV_CONVERSIONS: {
         "PATH": {
             from_string: { |s| $s | split row (char esep) }

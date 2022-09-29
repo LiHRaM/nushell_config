@@ -28,7 +28,7 @@ alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nu
 
 # Change directory to the path OR, if the path is empty, stay.
 def res_or_pwd [res] {
-    if ($res | empty?) { pwd | str trim } else { $res }
+    if ($res | is-empty) { pwd | str trim } else { $res }
 }
 
 # Edit the Neovim configuration directory. Windows only.
@@ -68,7 +68,7 @@ def nufzf [] {
 
 # Skip values that are empty
 def "not empty" [] {
-	each { |it| if ($it | empty?) { } else { $it } }
+	each { |it| if ($it | is-empty) { } else { $it } }
 }
 
 module completions {

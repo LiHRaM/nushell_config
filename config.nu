@@ -31,34 +31,6 @@ def res_or_pwd [res] {
     if ($res | is-empty) { pwd | str trim } else { $res }
 }
 
-# Edit the Neovim configuration directory. Windows only.
-def "conf nvim edit" [] {
-    if (false == (windows?)) { echo "This is only supported on Windows!"; } else {
-        cd $"($env.LOCALAPPDATA)/nvim"; eval $env.EDITOR;
-    }
-}
-
-# Run PackerSync in headless nvim, waiting until install completes.
-def "conf nvim sync" [] {
-    nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
-}
-
-# Switch to the nixos configuration and enter Neovim
-def "conf nixos edit" [] {
-    if (nixos?) { cd "~/.nixos"; eval $env.EDITOR } else { echo "Command only supported on NixOS" }
-}
-
-module dotnet {
-    # Runs `dotnet test`, filtering out end-to-end tests.
-    export def "dotnet unit" [] { dotnet test --filter TestCategory!=E2ETests }
-
-    # Runs `dotnet test`, with a filter matching only end-to-end tests.
-    export def "dotnet e2e" [] { dotnet test --filter TestCategory=E2ETests }
-
-    # Runs `dotnet format` with warn level `info`.
-    export def "dotnet fmt" [] { dotnet format -w info }
-}
-
 # A Nushell-compatible fzf wrapper
 def nufzf [] {
 	# fzf expects a newline separated string input,

@@ -29,10 +29,12 @@ load-env {
     # Useful OS defaults
     LANG: "en_DK",
     LC_ALL: "C.UTF-8",
+    LC_CTYPE: "UTF-8",
     LESSCHARSET: "UTF-8",
     EDITOR: "hx",
 
     # 3rd party programs
     FZF_DEFAULT_OPTS: "--layout=reverse",
     CARGO_TARGET_DIR: ("~/.cargo/target" | path expand),
+    USE_GKE_GCLOUD_AUTH_PLUGIN: false,
 }

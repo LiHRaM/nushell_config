@@ -1,6 +1,19 @@
-let-env config = {
-    show_banner: false
+let-env PATH = ($env.PATH | prepend "/Users/lihram/Library/Application Support/carapace/bin")
+
+let carapace_completer = {|spans| 
+  carapace $spans.0 nushell $spans | from json
 }
+
+let-env config = {
+  show_banner: false
+  completions: {
+    external: {
+      enable: true
+      completer: $carapace_completer
+    }
+  }
+}
+
 
 load-env {
     # PROMPT_COMMAND: "",
@@ -12,11 +25,11 @@ load-env {
     ENV_CONVERSIONS: {
         "PATH": {
             from_string: { |s| $s | split row (char esep) }
-            to_string: { |v| $v | str collect (char esep) }
+            to_string: { |v| $v | str join (char esep) }
         }
         "Path": {
             from_string: { |s| $s | split row (char esep) }
-            to_string: { |v| $v | str collect (char esep) }
+            to_string: { |v| $v | str join (char esep) }
         }
     },
     NU_LIB_DIRS: [

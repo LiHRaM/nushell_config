@@ -1,6 +1,6 @@
 # Execute an arbitrary string as Nushell input
 def eval [input: string] {
-  nu -c $input
+    nu -c $input
 }
 
 # Whether the current system is Windows
@@ -22,20 +22,21 @@ let-env REPOS_DIR = (if (windows?) { 'C:\git' } else { '~/git' | path expand })
 
 alias vim = nvim
 
-# Fuzzy navigate
-alias repos = cd (res_or_pwd (ein tool find $env.REPOS_DIR | fzf | str trim))
-alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nufzf))
-
 # Change directory to the path OR, if the path is empty, stay.
 def res_or_pwd [res] {
     if ($res | is-empty) { pwd | str trim } else { $res }
 }
 
+# Fuzzy navigate
+alias repos = cd (res_or_pwd (ein tool find $env.REPOS_DIR | fzf | str trim))
+alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nufzf))
+
+
 # A Nushell-compatible fzf wrapper
 def nufzf [] {
 	# fzf expects a newline separated string input,
 	# and returns a newline-terminated result.
-	str collect (char newline) | fzf --height=40% | str trim | not empty
+	str join (char newline) | fzf --height=40% | str trim | not empty
 }
 
 # Skip values that are empty
@@ -43,5 +44,3 @@ def "not empty" [] {
 	each { |it| if ($it | is-empty) { } else { $it } }
 }
 
-use ./nu_scripts/custom-completions/git/git-completions.nu *;
-use ./nu_scripts/custom-completions/npm/npm-completions.nu *;

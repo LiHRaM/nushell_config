@@ -28,16 +28,8 @@ def res_or_pwd [res] {
 }
 
 # Fuzzy navigate
-alias repos = cd (res_or_pwd (ein tool find $env.REPOS_DIR | fzf | str trim))
-alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | nufzf))
-
-
-# A Nushell-compatible fzf wrapper
-def nufzf [] {
-	# fzf expects a newline separated string input,
-	# and returns a newline-terminated result.
-	str join (char newline) | fzf --height=40% | str trim | not empty
-}
+alias repos = cd (res_or_pwd (ein tool find $env.REPOS_DIR | lines | input list --fuzzy "Repository: "))
+alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | input list --fuzzy "Directory: "))
 
 # Skip values that are empty
 def "not empty" [] {

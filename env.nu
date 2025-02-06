@@ -1,27 +1,62 @@
-let-env PATH = ($env.PATH | prepend "/Users/lihram/Library/Application Support/carapace/bin")
+$env.PATH = ($env.PATH | prepend "/Users/lihram/Library/Application Support/carapace/bin")
 
 let carapace_completer = {|spans| 
-  carapace $spans.0 nushell $spans | from json
+  let expanded_alias = (scope aliases | where name == $spans.0 | get -i 0 | get -i expansion)
+
+  # overwrite
+  let spans = (if $expanded_alias != null {
+    $spans | skip 1 | prepend ($expanded_alias | split row " " | take 1)
+  } else {
+    $spans
+  })
+
+  carapace $spans.0 nushell ...$spans | from json
 }
 
-let-env config = {
+$env.config = {
   show_banner: false
   completions: {
     external: {
       enable: true
       completer: $carapace_completer
     }
-  }
+  },
+  keybindings: [
+    {
+  name: fuzzy_history
+  modifier: control
+  keycode: char_r
+  mode: [emacs, vi_normal, vi_insert]
+  event: [
+    {
+      send: ExecuteHostCommand
+      cmd: "do {
+            commandline edit --insert (
+              history
+              | get command
+              | reverse
+              | uniq
+              | str join (char -i 0)
+              | fzf --scheme=history 
+                  --read0
+                  --layout=reverse
+                  --height=40%
+                  --bind 'ctrl-/:change-preview-window(right,70%|right)'
+                  --preview='echo -n {} | nu --stdin -c \'nu-highlight\''
+                  # Run without existing commandline query for now to test composability
+                  # -q (commandline)
+              | decode utf-8
+              | str trim
+            )
+          }"
+        }
+      ]
+    }
+  ]
 }
 
 
 load-env {
-    # PROMPT_COMMAND: "",
-    # PROMPT_COMMAND_RIGHT: "",
-    # PROMPT_INDICATOR: "; ",
-    # PROMPT_INDICATOR_VI_INSERT: { ": " },
-    # PROMPT_INDICATOR_VI_NORMAL: { "; " },
-    # PROMPT_MULTILINE_INDICATOR: { "::: " },
     ENV_CONVERSIONS: {
         "PATH": {
             from_string: { |s| $s | split row (char esep) }
@@ -40,7 +75,7 @@ load-env {
     ],
 
     # Useful OS defaults
-    LANG: "en_DK",
+    LANG: "en_US",
     LC_ALL: "C.UTF-8",
     LC_CTYPE: "UTF-8",
     LESSCHARSET: "UTF-8",

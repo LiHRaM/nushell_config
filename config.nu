@@ -5,15 +5,15 @@ def eval [input: string] {
 
 # Whether the current system is Windows
 def windows? [] {
-    (sys).host.name == "Windows"
+    (sys host).name == "Windows"
 }
 
 # Whether the current system is 
 def nixos? [] {
-    (sys).host.name == "NixOS"
+    (sys host).name == "NixOS"
 }
 
-let-env REPOS_DIR = (if (windows?) { 'C:\git' } else { '~/git' | path expand })
+$env.REPOS_DIR = (if (windows?) { 'C:\git' } else { '~/git' | path expand })
 
 # Kubernetes
 # alias awp = let-env AWS_PROFILE = (open --raw ~/.aws/config | lines | parse "[profile {profile}]" | get profile | nufzf)
@@ -36,3 +36,6 @@ def "not empty" [] {
 	each { |it| if ($it | is-empty) { } else { $it } }
 }
 
+# https://starship.rs/guide/#step-2-set-up-your-shell-to-use-starship
+mkdir ($nu.data-dir | path join "vendor/autoload")
+starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")

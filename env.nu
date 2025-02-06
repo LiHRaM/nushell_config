@@ -22,12 +22,46 @@ $env.config = {
     }
   },
   keybindings: [
-    {
-  name: fuzzy_history
-  modifier: control
-  keycode: char_r
-  mode: [emacs, vi_normal, vi_insert]
-  event: [
+  {
+    name: fuzzy_repos
+    modifier: control
+    keycode: char_p
+    mode: [emacs, vi_normal, vi_insert]
+    event: [
+      {
+        send: ExecuteHostCommand
+        cmd: "do {
+          commandline edit --insert (
+            ein tool find $env.REPOS_DIR
+              | fzf --height=40% --preview='ls {}'
+          )
+        }"
+      }
+    ]
+  },
+  {
+    name: fuzzy_directories
+    modifier: control
+    keycode: char_i
+    mode: [emacs, vi_normal, vi_insert]
+    event: [
+      {
+        send: ExecuteHostCommand
+        cmd: "do {
+          commandline edit --insert (
+            ls | where type == dir | get name | to text
+               | fzf --height=40% --preview='ls {}'
+          )
+        }"
+      }
+    ]
+  }
+  {
+    name: fuzzy_history
+    modifier: control
+    keycode: char_r
+    mode: [emacs, vi_normal, vi_insert]
+    event: [
     {
       send: ExecuteHostCommand
       cmd: "do {

@@ -27,10 +27,6 @@ def res_or_pwd [res] {
     if ($res | is-empty) { pwd | str trim } else { $res }
 }
 
-# Fuzzy navigate
-alias repos = cd (res_or_pwd (ein tool find $env.REPOS_DIR | lines | input list --fuzzy "Repository: "))
-alias cdd = cd (res_or_pwd (ls | where type == dir | each { |it| $it.name } | input list --fuzzy "Directory: "))
-
 # Skip values that are empty
 def "not empty" [] {
 	each { |it| if ($it | is-empty) { } else { $it } }

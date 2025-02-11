@@ -33,7 +33,13 @@ $env.config = {
         cmd: "do {
           commandline edit --insert (
             ein tool find $env.REPOS_DIR
-              | fzf --height=40% --preview='ls {}'
+              | fzf --scheme=path
+                    --keep-right
+                    --height=40%
+                    --preview='ls {}'
+                    --preview-window=down
+              | decode utf-8
+              | str trim
           )
         }"
       }
@@ -50,7 +56,13 @@ $env.config = {
         cmd: "do {
           commandline edit --insert (
             ls | where type == dir | get name | to text
-               | fzf --height=40% --preview='ls {}'
+               | fzf --scheme=path
+                     --keep-right
+                     --height=40%
+                     --preview='ls {}'
+                     --preview-window=down
+               | decode utf-8
+               | str trim
           )
         }"
       }

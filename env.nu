@@ -31,16 +31,7 @@ $env.config = {
       {
         send: ExecuteHostCommand
         cmd: "do {
-          commandline edit --insert (
-            ein tool find $env.REPOS_DIR
-              | fzf --scheme=path
-                    --keep-right
-                    --height=40%
-                    --preview='ls {}'
-                    --preview-window=down
-              | decode utf-8
-              | str trim
-          )
+          commandline edit --insert (tv git-repos --no-preview)
         }"
       }
     ]
@@ -54,16 +45,7 @@ $env.config = {
       {
         send: ExecuteHostCommand
         cmd: "do {
-          commandline edit --insert (
-            ls | where type == dir | get name | to text
-               | fzf --scheme=path
-                     --keep-right
-                     --height=40%
-                     --preview='ls {}'
-                     --preview-window=down
-               | decode utf-8
-               | str trim
-          )
+          commandline edit --insert (tv dirs --no-preview)
         }"
       }
     ]
@@ -89,6 +71,7 @@ $env.config = {
                   --height=40%
                   --bind 'ctrl-/:change-preview-window(right,70%|right)'
                   --preview='echo -n {} | nu --stdin -c \'nu-highlight\''
+                  --preview-window=down
                   # Run without existing commandline query for now to test composability
                   # -q (commandline)
               | decode utf-8

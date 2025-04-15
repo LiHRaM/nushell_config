@@ -9,3 +9,4 @@ $env.PATH = (
     | path expand
 )
 $env.DOCKER_DEFAULT_PLATFORM = "linux/amd64"
+$env.XDG_CONFIG_HOME = $"($env.HOME)/.config/"

@@ -1,3 +1,12 @@
+# Preview Markdown files being changed
+def markview [path: string = "."] {
+    echo "Edit your files to start previewing"
+    watch $path --glob=**/*.md {|op, path|
+        clear
+        glow $path
+    }
+}
+
 # Execute an arbitrary string as Nushell input
 def eval [input: string] {
     nu -c $input

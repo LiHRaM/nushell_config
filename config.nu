@@ -44,3 +44,8 @@ def "not empty" [] {
 # https://starship.rs/guide/#step-2-set-up-your-shell-to-use-starship
 mkdir ($nu.data-dir | path join "vendor/autoload")
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
+
+# https://docs.atuin.sh/guide/installation/
+mkdir ($nu.data-dir | path join "vendor/autoload")
+atuin init nu | save -f ($nu.data-dir | path join "vendor/autoload/atuin.nu")
+

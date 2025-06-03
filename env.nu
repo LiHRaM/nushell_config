@@ -1,4 +1,13 @@
-$env.PATH = ($env.PATH | prepend "/Users/lihram/Library/Application Support/carapace/bin")
+use std
+
+$env.PATH ++= (
+  [
+    "/nix/var/nix/profiles/default/bin/",
+    "~/.nix-profile/bin",
+    "~/.cargo/bin",
+  ]
+  | path expand
+)
 
 let carapace_completer = {|spans| 
   let expanded_alias = (scope aliases | where name == $spans.0 | get -i 0 | get -i expansion)

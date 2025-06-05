@@ -2,9 +2,13 @@ use std
 
 $env.PATH ++= (
   [
+    "/usr/bin",
+    "/usr/local/bin",
     "/nix/var/nix/profiles/default/bin/",
     "~/.nix-profile/bin",
     "~/.cargo/bin",
+    "~/.local/bin",
+    "~/.pulumi/bin",
   ]
   | path expand
 )

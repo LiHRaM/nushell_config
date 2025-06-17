@@ -1,3 +1,5 @@
+source ./synq-utils.nu
+
 # Preview Markdown files being changed
 def markview [path: string = "."] {
     echo "Edit your files to start previewing"
@@ -40,6 +42,10 @@ def res_or_pwd [res] {
 def "not empty" [] {
 	each { |it| if ($it | is-empty) { } else { $it } }
 }
+
+# https://carapace-sh.github.io/carapace-bin/setup.html#nushell
+mkdir ($nu.data-dir | path join "vendor/autoload")
+carapace _carapace nushell | save -f ($nu.data-dir | path join "vendor/autoload/carapace.nu")
 
 # https://starship.rs/guide/#step-2-set-up-your-shell-to-use-starship
 mkdir ($nu.data-dir | path join "vendor/autoload")

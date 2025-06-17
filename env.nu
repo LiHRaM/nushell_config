@@ -9,31 +9,16 @@ $env.PATH ++= (
     "~/.cargo/bin",
     "~/.local/bin",
     "~/.pulumi/bin",
+    "~/go/bin",
   ]
   | path expand
 )
 
-let carapace_completer = {|spans| 
-  let expanded_alias = (scope aliases | where name == $spans.0 | get -i 0 | get -i expansion)
+$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense'
 
-  # overwrite
-  let spans = (if $expanded_alias != null {
-    $spans | skip 1 | prepend ($expanded_alias | split row " " | take 1)
-  } else {
-    $spans
-  })
-
-  carapace $spans.0 nushell ...$spans | from json
-}
 
 $env.config = {
   show_banner: false
-  completions: {
-    external: {
-      enable: true
-      completer: $carapace_completer
-    }
-  },
   keybindings: [
   {
     name: fuzzy_repos

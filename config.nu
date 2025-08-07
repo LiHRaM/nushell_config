@@ -1,5 +1,3 @@
-source ./synq-utils.nu
-
 $env.REPOS_DIR = (if ((sys host).name == "Windows") { 'C:\git' } else { '~/git' | path expand })
 
 # https://carapace-sh.github.io/carapace-bin/setup.html#nushell
@@ -12,7 +10,18 @@ starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.n
 
 # https://docs.atuin.sh/guide/installation/
 mkdir ($nu.data-dir | path join "vendor/autoload")
+
 atuin init nu | save -f ($nu.data-dir | path join "vendor/autoload/atuin.nu")
+
+# TODO(Hilmar): Remove when atuin script has been updated
+# BEG: Atuin workaround
+let dir = ($nu.data-dir | path join "vendor/autoload/atuin.nu")
+if (open --raw $dir | str contains "get -i") {
+    open --raw $dir | str replace --all "get -i" "get -o" | save --force $dir
+} else {
+    print "Alright buddy, it's time to update the script and remove this block. Atuin no longer uses the deprecated option."
+}
+# END: Atuin workaround
 
 # fnm
 if not (which fnm | is-empty) {

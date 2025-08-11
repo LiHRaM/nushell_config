@@ -1,16 +1,14 @@
 $env.REPOS_DIR = (if ((sys host).name == "Windows") { 'C:\git' } else { '~/git' | path expand })
 
-# https://carapace-sh.github.io/carapace-bin/setup.html#nushell
 mkdir ($nu.data-dir | path join "vendor/autoload")
+
+# https://carapace-sh.github.io/carapace-bin/setup.html#nushell
 carapace _carapace nushell | save -f ($nu.data-dir | path join "vendor/autoload/carapace.nu")
 
 # https://starship.rs/guide/#step-2-set-up-your-shell-to-use-starship
-mkdir ($nu.data-dir | path join "vendor/autoload")
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 
 # https://docs.atuin.sh/guide/installation/
-mkdir ($nu.data-dir | path join "vendor/autoload")
-
 atuin init nu | save -f ($nu.data-dir | path join "vendor/autoload/atuin.nu")
 
 # TODO(Hilmar): Remove when atuin script has been updated
@@ -35,3 +33,5 @@ if not (which fnm | is-empty) {
         }
     )
 }
+
+use utils.nu

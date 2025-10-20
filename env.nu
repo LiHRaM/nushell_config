@@ -1,15 +1,16 @@
 use std
 
-$env.PATH ++= (
-  [
-    "/usr/bin",
-    "/usr/local/bin",
+$env.PATH = ([
+    "~/go/bin",
     "/nix/var/nix/profiles/default/bin/",
     "~/.nix-profile/bin",
     "~/.cargo/bin",
     "~/.local/bin",
     "~/.pulumi/bin",
     "~/go/bin",
+  ] ++ $env.PATH ++ [
+    "/usr/bin"
+    "/usr/local/bin"
   ]
   | path expand
 )

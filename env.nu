@@ -29,7 +29,7 @@ $env.config = {
     event: [
       {
         send: ExecuteHostCommand
-        cmd: "do {
+        cmd: " do {
           commandline edit --insert (tv git-repos --no-preview)
         }"
       }
@@ -43,7 +43,7 @@ $env.config = {
     event: [
       {
         send: ExecuteHostCommand
-        cmd: "do {
+        cmd: " do {
           commandline edit --insert (tv dirs --no-preview)
         }"
       }
@@ -57,7 +57,7 @@ $env.config = {
     event: [
     {
       send: ExecuteHostCommand
-      cmd: "do {
+      cmd: " do {
             commandline edit --insert (
               history
               | get command

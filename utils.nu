@@ -1,3 +1,5 @@
+use std/log
+
 # Convenience function for trailing structured JSON logs.
 # Ignores any logs that aren't JSON.
 export def "logs tail" [
@@ -40,4 +42,37 @@ export def "listen" [
       }
     }
   }
+}
+
+# Load environment variables into a key-value structure for use with [load-env].
+# Expects a json file `.env.json` in the format:
+# 
+# ```json
+# {
+#   "shared": {
+#      "FOO": "BAR"
+#   },
+#   "staging": {
+#      "BAZ": "QUUX"
+#   }
+# }
+# ```
+export def --env "env" [
+  environment: string = "staging", # The environment to fetch from the configuration
+  --file: path = ".env.json",      # The file containing the environment configuration
+] {
+  if ($file | path exists) == false {
+    log error $"File ($file) does not exist."
+    return null
+  }
+
+  let envs = (open $file)
+  let available = ($envs | reject shared | columns)
+
+  if ($environment in $available) == false {
+    log error $"($environment) not found. Available: ($available)"
+    return null
+  }
+
+  load-env (($envs | get shared) | merge ($envs | get $environment))
 }

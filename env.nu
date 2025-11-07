@@ -30,8 +30,16 @@ $env.config = {
         {
           send: ExecuteHostCommand
           cmd: " do {
-            let action = (tv --source-command='tv list-channels')
+            let action = (tv list-channels | tv)
+            if ($action | is-empty) {
+              return
+            }
+
             let to_insert = (tv $action --no-preview)
+            if ($to_insert | is-empty) {
+              return
+            }
+
             commandline edit --insert $to_insert
           }"
         }

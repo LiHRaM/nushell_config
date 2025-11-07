@@ -44,6 +44,21 @@ export def "listen" [
   }
 }
 
+const env_file = ".env.json"
+
+export def get-environments [] {
+  if ($env_file | path exists) == false {
+    log error $"File ($env_file) does not exist."
+    return null
+  }
+
+  open $env_file
+}
+
+export def list-environments [] {
+  get-environments | reject --optional shared | columns
+}
+
 # Load environment variables into a key-value structure for use with [load-env].
 # Expects a json file `.env.json` in the format:
 # 
@@ -58,21 +73,23 @@ export def "listen" [
 # }
 # ```
 export def --env "env" [
-  environment: string = "staging", # The environment to fetch from the configuration
-  --file: path = ".env.json",      # The file containing the environment configuration
+  environment: string@list-environments, # The environment to fetch from the configuration
 ] {
-  if ($file | path exists) == false {
-    log error $"File ($file) does not exist."
-    return null
-  }
-
-  let envs = (open $file)
-  let available = ($envs | reject shared | columns)
+  let available = list-environments
 
   if ($environment in $available) == false {
     log error $"($environment) not found. Available: ($available)"
     return null
   }
 
-  load-env (($envs | get shared) | merge ($envs | get $environment))
+  let envs = (
+    get-environments |
+    select --optional shared $environment |
+    flatten |
+    reduce --fold {} {|it, acc| $acc | merge $it }
+  )
+
+  log info $"Loading ($envs)"
+
+  load-env $envs
 }

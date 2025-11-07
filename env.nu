@@ -67,8 +67,7 @@ $env.config = {
                     --bind 'ctrl-/:change-preview-window(right,70%|right)'
                     --preview='echo -n {} | nu --stdin -c \'nu-highlight\''
                     --preview-window=down
-                    # Run without existing commandline query for now to test composability
-                    # -q (commandline)
+                    -q (commandline)
                 | decode utf-8
                 | str trim
               )

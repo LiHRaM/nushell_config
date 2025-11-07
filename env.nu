@@ -15,67 +15,55 @@ $env.PATH = ([
   | path expand
 )
 
-$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense'
+$env.CARAPACE_BRIDGES = 'click,cobra'
 
 
 $env.config = {
   show_banner: false
   keybindings: [
-  {
-    name: fuzzy_repos
-    modifier: control
-    keycode: char_p
-    mode: [emacs, vi_normal, vi_insert]
-    event: [
-      {
-        send: ExecuteHostCommand
-        cmd: " do {
-          commandline edit --insert (tv git-repos --no-preview)
-        }"
-      }
-    ]
-  },
-  {
-    name: fuzzy_directories
-    modifier: control
-    keycode: char_i
-    mode: [emacs, vi_normal, vi_insert]
-    event: [
-      {
-        send: ExecuteHostCommand
-        cmd: " do {
-          commandline edit --insert (tv dirs --no-preview)
-        }"
-      }
-    ]
-  }
-  {
-    name: fuzzy_history
-    modifier: control
-    keycode: char_r
-    mode: [emacs, vi_normal, vi_insert]
-    event: [
     {
-      send: ExecuteHostCommand
-      cmd: " do {
-            commandline edit --insert (
-              history
-              | get command
-              | reverse
-              | uniq
-              | str join (char -i 0)
-              | fzf --scheme=history 
-                  --read0
-                  --layout=reverse
-                  --height=40%
-                  --bind 'ctrl-/:change-preview-window(right,70%|right)'
-                  --preview='echo -n {} | nu --stdin -c \'nu-highlight\''
-                  --preview-window=down
-                  # Run without existing commandline query for now to test composability
-                  # -q (commandline)
-              | decode utf-8
-              | str trim
-            )
+      name: fuzzy_finder
+      modifier: control
+      keycode: char_p
+      mode: [emacs, vi_normal, vi_insert]
+      event: [
+        {
+          send: ExecuteHostCommand
+          cmd: " do {
+            let action = (tv --source-command='tv list-channels')
+            let to_insert = (tv $action --no-preview)
+            commandline edit --insert $to_insert
+          }"
+        }
+      ]
+    },
+    {
+      name: fuzzy_history
+      modifier: control
+      keycode: char_r
+      mode: [emacs, vi_normal, vi_insert]
+      event: [
+        {
+          send: ExecuteHostCommand
+          cmd: " do {
+              commandline edit --insert (
+                history
+                | get command
+                | reverse
+                | uniq
+                | str join (char -i 0)
+                | fzf --scheme=history 
+                    --read0
+                    --layout=reverse
+                    --height=40%
+                    --bind 'ctrl-/:change-preview-window(right,70%|right)'
+                    --preview='echo -n {} | nu --stdin -c \'nu-highlight\''
+                    --preview-window=down
+                    # Run without existing commandline query for now to test composability
+                    # -q (commandline)
+                | decode utf-8
+                | str trim
+              )
           }"
         }
       ]

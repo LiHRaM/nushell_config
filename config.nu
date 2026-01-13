@@ -24,11 +24,14 @@ def --env --wrapped wt [...args: string] {
         }
     } | complete
 
-    print $result.stdout
-    print --stderr $result.stderr
+    mut directive = ""
+    if ($directive_file | path exists) {
+        $directive = open $directive_file --raw | str trim
+        rm -f $directive_file
+    }
+    let directive = $directive
 
-    if ($directive_file | path exists) and (open $directive_file --raw | str trim | is-not-empty) {
-        let directive = open $directive_file --raw | str trim
+    if ($directive | is-not-empty) {
         # Parse directive: worktrunk emits "cd <path>" for directory changes
         if ($directive | str starts-with "cd ") {
             let target_dir = $directive | parse "cd '{target_dir}'" | get 0.target_dir
@@ -36,11 +39,12 @@ def --env --wrapped wt [...args: string] {
         }
     }
 
-    rm -f $directive_file
-
     if $result.exit_code != 0 {
         error make { msg: $"{{ cmd }} exited with code ($result.exit_code)" }
     }
+
+    print $result.stdout
+    print --stderr $result.stderr
 }
 # END TODO
 

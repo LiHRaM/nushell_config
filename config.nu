@@ -39,12 +39,8 @@ def --env --wrapped wt [...args: string] {
         }
     }
 
-    if $result.exit_code != 0 {
-        error make { msg: $"{{ cmd }} exited with code ($result.exit_code)" }
-    }
-
-    print $result.stdout
     print --stderr $result.stderr
+    $result.stdout
 }
 # END TODO
 

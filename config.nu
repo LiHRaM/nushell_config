@@ -15,37 +15,7 @@ starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.n
 atuin init nu | save -f ($nu.data-dir | path join "vendor/autoload/atuin.nu")
 
 # worktrunk.dev
-# wt config shell init nu | save -f ($nu.data-dir | path join "vendor/autoload/wt.nu")
-#
-# TODO(Hilmar): Remove when https://github.com/max-sixty/worktrunk/pull/535 is merged.
-def --env --wrapped wt [...args: string] {
-    let directive_file = (mktemp)
-
-    let result = do {
-        with-env { WORKTRUNK_DIRECTIVE_FILE: $directive_file } {
-            ^wt ...$args
-        }
-    } | complete
-
-    mut directive = ""
-    if ($directive_file | path exists) {
-        $directive = open $directive_file --raw | str trim
-        rm -f $directive_file
-    }
-    let directive = $directive
-
-    if ($directive | is-not-empty) {
-        # Parse directive: worktrunk emits "cd <path>" for directory changes
-        if ($directive | str starts-with "cd ") {
-            let target_dir = $directive | parse "cd '{target_dir}'" | get 0.target_dir
-            cd $target_dir
-        }
-    }
-
-    print --stderr $result.stderr
-    $result.stdout
-}
-# END TODO
+wt config shell init nu | save -f ($nu.data-dir | path join "vendor/autoload/wt.nu")
 
 # fnm
 if (which fnm | is-not-empty) {

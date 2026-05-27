@@ -5,6 +5,9 @@ mkdir ($nu.data-dir | path join "vendor/autoload")
 # https://carapace-sh.github.io/carapace-bin/setup.html#nushell
 carapace _carapace nushell | save -f ($nu.data-dir | path join "vendor/autoload/carapace.nu")
 
+# Requires Nushell 0.96+
+fnox activate nu | save -f ($nu.data-dir | path join "vendor/autoload/fnox.nu")
+
 # https://starship.rs/guide/#step-2-set-up-your-shell-to-use-starship
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 

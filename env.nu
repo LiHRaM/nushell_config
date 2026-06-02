@@ -7,12 +7,11 @@ $env.PATH = ([
     "~/.cargo/bin",
     "~/.local/bin",
     "~/.pulumi/bin",
-    "~/go/bin",
   ] ++ $env.PATH ++ [
     "/usr/bin"
     "/usr/local/bin"
   ]
-  | path expand
+  | path expand --no-symlink
 )
 
 $env.CARAPACE_BRIDGES = 'click,cobra'
